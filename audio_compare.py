@@ -2,8 +2,8 @@ import pyttsx3
 import fourier
 import matplotlib.pyplot as plt
 
-fourierA, lengthA = fourier.fourier('output.wav')
-fourierB, lengthB = fourier.fourier('output2.wav')
+fourierA, lengthA = fourier.fourier('test.wav')
+fourierB, lengthB = fourier.fourier('test3.wav')
 
 absCorr = fourier.correlation(fourierA, fourierB)
 

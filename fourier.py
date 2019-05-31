@@ -22,3 +22,5 @@ def fourier(wave_file):
 
 def correlation(f1, f2):
     return max(abs(ifft(f1 * numpy.conj(f2))))
+#def correlation(f1, f2):
+#    return numpy.corrcoef(ifft(f1 * numpy.conj(f2)))
