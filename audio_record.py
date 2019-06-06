@@ -34,3 +34,7 @@ def record_audio(file_name):
     wf.setframerate(RATE)
     wf.writeframes(b''.join(frames))
     wf.close()
+
+
+
+#record_audio("test_data_input/google-test.wav")

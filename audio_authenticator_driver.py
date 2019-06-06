@@ -1,35 +1,16 @@
 import speech_recognition as sr
 import pyttsx3
-import audio_compare
-import audio_record
 import time
-#Initialize speaking engine
+import register
+import login
 
 engine = pyttsx3.init()
 engine.setProperty('rate', 150)  # Lower -> Slower
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)  # 0 - Male, 1 - Female
 
-
-def login():
-    audio_record.record_audio("login.wav")
-    result = audio_compare.compare("register.wav", "login.wav")
-    if result:
-        engine.say("Authorization successful")
-        engine.runAndWait()
-    else:
-        engine.say("Authorization failed")
-        engine.runAndWait()
-
-
-def register():
-    audio_record.record_audio("register.wav")
-
-
 keywords = [("visa", 1), ("hey visa", 1), ]
 commands = [("login", 1), ("register", 1), ]
-r = sr.Recognizer()
-source = sr.Microphone()
 
 
 def callback(recognizer, audio):  # this is called from the background thread
@@ -48,15 +29,24 @@ def callback(recognizer, audio):  # this is called from the background thread
 
 def recognize_main():
     print("Recognizing Main...")
+    r = sr.Recognizer()
+    engine.say("Hello, Please speak your name.")
+    engine.runAndWait()
+    with sr.Microphone() as source:
+        try:
+            audio = r.listen(source)
+            name = r.recognize_google(audio)
+            print(name)
+        except Exception as e:
+            print(e)
+            engine.say("Sorry could not understand, please speak again")
+            engine.runAndWait()
     re = sr.Recognizer()
-    engine.say("Welcome!! Please speak login, to login to the system, or register, to register yourself")
+    engine.say("Welcome " + name + "!! Please speak login, to login to the system, or register, to register yourself")
     engine.runAndWait()
     with sr.Microphone() as source1:
-        re.energy_threshold = 4000
-        audio = re.listen(source1, phrase_time_limit=3)  # listen to the source
-        text = re.recognize_google(audio)
-        print("listened")
         try:
+            audio = re.listen(source1)
             text = re.recognize_google(audio)
             print(text)
         except Exception as e:
@@ -67,21 +57,29 @@ def recognize_main():
     if text == "login":
         engine.say("Please speak authorization passcode")
         engine.runAndWait()
-        login()
+        result= login.login(name)
+        if result == 'true':
+            engine.say("Authentication Successful !!!")
+            engine.runAndWait()
+        else:
+            engine.say("Authentication Failed !!")
+            engine.runAndWait()
     elif text == "register":
-        engine.say("You choose registration, Please speak your name after 2 seconds ")
+        engine.say("You choose registration")
         engine.runAndWait()
-        register()
+        register.register(name)
     else:
         engine.say("You spoke " + text + ", this option is not supported")
         engine.runAndWait()
         exit(0)
 
 
-def start_recognizer():
-    r.listen_in_background(source, callback)
-    time.sleep(1000000)
 
+def start_recognizer():
+    rM = sr.Recognizer()
+    sourceM = sr.Microphone()
+    rM.listen_in_background(sourceM, callback)
+    time.sleep(1000000)
 
 
 #start_recognizer()
