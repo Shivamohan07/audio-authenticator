@@ -105,3 +105,6 @@ venv.bak/
 
 .idea/
 *wav
+test_data_input/
+training_data_input/
+training_result/

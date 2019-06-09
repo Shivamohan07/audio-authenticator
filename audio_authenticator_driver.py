@@ -30,49 +30,61 @@ def callback(recognizer, audio):  # this is called from the background thread
 def recognize_main():
     print("Recognizing Main...")
     r = sr.Recognizer()
-    engine.say("Hello, Please speak your name.")
+    engine.say("Hello, Please speak your name ")
     engine.runAndWait()
-    with sr.Microphone() as source:
-        try:
-            audio = r.listen(source)
-            name = r.recognize_google(audio)
-            print(name)
-        except Exception as e:
-            print(e)
-            engine.say("Sorry could not understand, please speak again")
-            engine.runAndWait()
+    listened = 0
+    while listened != 1:
+        with sr.Microphone() as source:
+            try:
+                r.adjust_for_ambient_noise(source)
+                audio = r.listen(source)
+                name = r.recognize_google(audio)
+                print(name)
+                listened = 1
+            except Exception as e:
+                print(e)
+                engine.say("Sorry could not understand, please speak again")
+                engine.runAndWait()
+
     re = sr.Recognizer()
-    engine.say("Welcome " + name + "!! Please speak login, to login to the system, or register, to register yourself")
+    engine.say("Welcome " + name + "!! Speak login, to login, or register, to register, else speak cancel")
     engine.runAndWait()
-    with sr.Microphone() as source1:
-        try:
-            audio = re.listen(source1)
-            text = re.recognize_google(audio)
-            print(text)
-        except Exception as e:
-            print(e)
-            engine.say("Sorry could not understand, please speak again")
-            engine.runAndWait()
+    option = 0
+    while option != 1:
+        with sr.Microphone() as source1:
+            try:
+                re.adjust_for_ambient_noise(source1)
+                audio = re.listen(source1)
+                text = re.recognize_google(audio)
+                print(text)
+                option = 1
+            except Exception as e:
+                print(e)
+                engine.say("Sorry could not understand, please speak again")
+                engine.runAndWait()
 
     if text == "login":
         engine.say("Please speak authorization passcode")
         engine.runAndWait()
-        result= login.login(name)
+        result = login.login(name)
         if result == 'true':
             engine.say("Authentication Successful !!!")
             engine.runAndWait()
         else:
-            engine.say("Authentication Failed !!")
+            engine.say("Authentication Failed !!!")
             engine.runAndWait()
     elif text == "register":
-        engine.say("You choose registration")
+        engine.say("You chose registration")
         engine.runAndWait()
         register.register(name)
+    elif text == "cancel":
+        engine.say("You chose cancel, Bye!!!")
+        engine.runAndWait()
+        exit(0)
     else:
         engine.say("You spoke " + text + ", this option is not supported")
         engine.runAndWait()
         exit(0)
-
 
 
 def start_recognizer():
